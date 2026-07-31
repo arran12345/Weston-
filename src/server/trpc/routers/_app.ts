@@ -4,6 +4,7 @@ import { netWorthRouter } from "@/server/trpc/routers/net-worth";
 import { salaryRouter } from "@/server/trpc/routers/salary";
 import { allocationRouter } from "@/server/trpc/routers/allocation";
 import { budgetingRouter } from "@/server/trpc/routers/budgeting";
+import { goalsRouter } from "@/server/trpc/routers/goals";
 
 export const appRouter = router({
   health: publicProcedure.query(() => ({ ok: true as const })),
@@ -12,6 +13,7 @@ export const appRouter = router({
   salary: salaryRouter,
   allocation: allocationRouter,
   budgeting: budgetingRouter,
+  goals: goalsRouter,
 });
 
 export type AppRouter = typeof appRouter;

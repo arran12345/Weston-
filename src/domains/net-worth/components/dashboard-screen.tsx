@@ -2,10 +2,10 @@
 
 import { trpc } from "@/shared/lib/trpc/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
-import { EmptyState } from "@/shared/ui/empty-state";
 import { FlatLineChart } from "@/shared/charts/line-chart";
 import { NetWorthHero } from "@/domains/net-worth/components/net-worth-hero";
 import { AllocationCard } from "@/domains/allocation/components/allocation-card";
+import { DashboardGoalsCard } from "@/domains/goals/components/dashboard-goals-card";
 
 export function DashboardScreen() {
   const summary = trpc.netWorth.summary.useQuery();
@@ -55,10 +55,7 @@ export function DashboardScreen() {
 
       <AllocationCard />
 
-      <EmptyState
-        title="Goal progress"
-        description="Create a goal — house deposit or otherwise — to see trajectory and progress here. Built in Milestone 4."
-      />
+      <DashboardGoalsCard />
     </div>
   );
 }
