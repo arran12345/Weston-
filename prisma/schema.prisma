@@ -1,0 +1,192 @@
+// Finance OS — Prisma schema
+// See docs/PRD.md Section 8 for the design rationale behind these entities.
+// Single local SQLite file; every domain row is scoped to a User so the
+// schema doesn't have to change if this ever becomes multi-user (Section 2, 18).
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+
+  accounts           Account[]
+  categories         Category[]
+  budgets            Budget[]
+  salaryRecords      SalaryRecord[]
+  monthlyAllocations MonthlyAllocation[]
+  goals              Goal[]
+}
+
+enum AccountType {
+  SAVINGS
+  INVESTMENT
+  CURRENT
+  DEBT
+}
+
+model Account {
+  id       String      @id @default(cuid())
+  userId   String
+  user     User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type     AccountType
+  name     String
+  provider String?
+  currency String      @default("GBP")
+  isManual Boolean     @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  snapshots    AccountSnapshot[]
+  transactions Transaction[]
+  goalLinks    GoalAccount[]
+
+  @@index([userId])
+}
+
+// Net worth is never stored as a mutable field — it's derived by summing
+// each account's latest snapshot. This table is what makes that a genuine,
+// queryable time series rather than a single overwritten number (Section 8).
+model AccountSnapshot {
+  id         String   @id @default(cuid())
+  accountId  String
+  account    Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  balance    Float
+  capturedAt DateTime @default(now())
+
+  createdAt DateTime @default(now())
+
+  @@index([accountId, capturedAt])
+}
+
+enum TransactionSource {
+  MANUAL
+  IMPORT
+}
+
+model Transaction {
+  id          String            @id @default(cuid())
+  accountId   String
+  account     Account           @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  categoryId  String?
+  category    Category?         @relation(fields: [categoryId], references: [id])
+  amount      Float
+  date        DateTime
+  description String
+  source      TransactionSource @default(MANUAL)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([accountId, date])
+  @@index([categoryId])
+}
+
+// Hierarchical from day one (self-referencing parent) so a flat table never
+// has to be migrated later — see Section 8's rationale.
+model Category {
+  id       String     @id @default(cuid())
+  userId   String
+  user     User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name     String
+  parentId String?
+  parent   Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  children Category[] @relation("CategoryHierarchy")
+
+  transactions Transaction[]
+  budgets      Budget[]
+
+  @@index([userId])
+  @@index([parentId])
+}
+
+model Budget {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categoryId    String
+  category      Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  monthlyTarget Float
+  period        DateTime // first-of-month marker this target applies to
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, period])
+  @@index([categoryId])
+}
+
+model SalaryRecord {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount        Float
+  effectiveDate DateTime
+  notes         String?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, effectiveDate])
+}
+
+// Tracks the £700/£300-style split: what the strategy planned for the month
+// vs. what was actually confirmed as executed (Journey B).
+model MonthlyAllocation {
+  id                       String    @id @default(cuid())
+  userId                   String
+  user                     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  month                    DateTime // first-of-month marker
+  plannedSavingsAmount     Float
+  plannedInvestmentAmount  Float
+  actualSavingsAmount      Float?
+  actualInvestmentAmount   Float?
+  confirmedAt              DateTime?
+  notes                    String?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, month])
+}
+
+enum GoalType {
+  HOUSE_DEPOSIT
+  CUSTOM
+}
+
+// Generic goal engine — house deposit is an instance of this, not its own
+// table (Section 8). `metadata` carries type-specific extras as JSON text.
+model Goal {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type         GoalType
+  name         String
+  targetAmount Float
+  targetDate   DateTime?
+  metadata     String? // JSON-encoded, shape depends on `type`
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  linkedAccounts GoalAccount[]
+
+  @@index([userId])
+}
+
+// Join table for Goal.linked_account_ids[] — SQLite has no native array
+// column, so the many-to-many is modelled explicitly.
+model GoalAccount {
+  goalId    String
+  goal      Goal    @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  accountId String
+  account   Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@id([goalId, accountId])
+}
