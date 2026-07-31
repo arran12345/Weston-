@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
 import { EmptyState } from "@/shared/ui/empty-state";
 import { FlatLineChart } from "@/shared/charts/line-chart";
 import { NetWorthHero } from "@/domains/net-worth/components/net-worth-hero";
+import { AllocationCard } from "@/domains/allocation/components/allocation-card";
 
 export function DashboardScreen() {
   const summary = trpc.netWorth.summary.useQuery();
@@ -52,16 +53,12 @@ export function DashboardScreen() {
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-        <EmptyState
-          title="This month's allocation"
-          description="Once you log a monthly allocation, this will show whether your savings/investment split executed as planned. Built in Milestone 2."
-        />
-        <EmptyState
-          title="Goal progress"
-          description="Create a goal — house deposit or otherwise — to see trajectory and progress here. Built in Milestone 4."
-        />
-      </div>
+      <AllocationCard />
+
+      <EmptyState
+        title="Goal progress"
+        description="Create a goal — house deposit or otherwise — to see trajectory and progress here. Built in Milestone 4."
+      />
     </div>
   );
 }

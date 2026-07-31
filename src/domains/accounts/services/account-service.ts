@@ -1,7 +1,7 @@
 import { TRPCError } from "@trpc/server";
 
 import type { PrismaClient } from "@/generated/prisma/client";
-import type { AccountWithBalance } from "@/domains/accounts/types";
+import { AccountType, type AccountWithBalance } from "@/domains/accounts/types";
 import type {
   CreateAccountInput,
   UpdateAccountInput,
@@ -38,6 +38,8 @@ export async function listAccounts(
       currency: account.currency,
       latestBalance: latest?.balance ?? null,
       latestCapturedAt: latest?.capturedAt ?? null,
+      interestRatePct: account.interestRatePct,
+      termEndDate: account.termEndDate,
     };
   });
 }
@@ -63,16 +65,37 @@ export async function getAccount(
   return account;
 }
 
+/**
+ * Debt terms only mean anything on a DEBT account — clear them otherwise so
+ * changing an account's type can't leave a stale term behind.
+ */
+function debtTermFields(input: {
+  type: AccountType;
+  interestRatePct?: number;
+  termEndDate?: Date;
+}) {
+  if (input.type !== AccountType.DEBT) {
+    return { interestRatePct: null, termEndDate: null };
+  }
+
+  return {
+    interestRatePct: input.interestRatePct ?? null,
+    termEndDate: input.termEndDate ? startOfLocalDay(input.termEndDate) : null,
+  };
+}
+
 export async function createAccount(
   prisma: PrismaClient,
   userId: string,
   input: CreateAccountInput,
 ) {
-  const { openingBalance, ...accountData } = input;
+  const { openingBalance, interestRatePct, termEndDate, ...accountData } =
+    input;
 
   return prisma.account.create({
     data: {
       ...accountData,
+      ...debtTermFields({ type: input.type, interestRatePct, termEndDate }),
       provider: accountData.provider || null,
       userId,
       snapshots:
@@ -93,13 +116,17 @@ export async function updateAccount(
   userId: string,
   input: UpdateAccountInput,
 ) {
-  const { id, ...data } = input;
+  const { id, interestRatePct, termEndDate, ...data } = input;
 
   // Scope the write to this user — updateMany so a mismatched userId is a
   // no-op rather than an update of someone else's row.
   const result = await prisma.account.updateMany({
     where: { id, userId },
-    data: { ...data, provider: data.provider || null },
+    data: {
+      ...data,
+      ...debtTermFields({ type: input.type, interestRatePct, termEndDate }),
+      provider: data.provider || null,
+    },
   });
 
   if (result.count === 0) {

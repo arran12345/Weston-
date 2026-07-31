@@ -16,6 +16,9 @@ export const createAccountSchema = z.object({
   // Required rather than defaulted so the schema's input and output types
   // match — react-hook-form resolves against the input type.
   currency: z.string().trim().length(3),
+  // Debt terms (Section 4) — only meaningful on DEBT accounts.
+  interestRatePct: z.number().finite().min(0).max(100).optional(),
+  termEndDate: z.date().optional(),
   /**
    * Optional opening balance — logged as the account's first snapshot.
    * Debt accounts take a positive "amount owed".
@@ -29,6 +32,8 @@ export const updateAccountSchema = z.object({
   type: accountTypeSchema,
   provider: z.string().trim().max(80).optional(),
   currency: z.string().trim().length(3),
+  interestRatePct: z.number().finite().min(0).max(100).optional(),
+  termEndDate: z.date().optional(),
 });
 
 export const deleteAccountSchema = z.object({

@@ -23,6 +23,22 @@ model User {
   salaryRecords      SalaryRecord[]
   monthlyAllocations MonthlyAllocation[]
   goals              Goal[]
+  allocationStrategy AllocationStrategy?
+}
+
+// The standing savings/investment split (the £700/£300 strategy), editable in
+// Settings per Section 15. One per user — monthly allocations are seeded from
+// it, but keep their own planned amounts so changing the strategy never
+// rewrites what a past month was actually planned against.
+model AllocationStrategy {
+  id               String @id @default(cuid())
+  userId           String @unique
+  user             User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  savingsAmount    Float
+  investmentAmount Float
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum AccountType {
@@ -41,6 +57,12 @@ model Account {
   provider String?
   currency String      @default("GBP")
   isManual Boolean     @default(true)
+
+  // Debt terms (Section 4): we track the rate and when a promotional term
+  // ends so the 0% expiry can be warned about. Deliberately NOT a repayment
+  // planner — that's an explicit scope cut.
+  interestRatePct Float?
+  termEndDate     DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

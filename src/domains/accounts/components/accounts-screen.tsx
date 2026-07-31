@@ -15,6 +15,7 @@ import {
   type AccountWithBalance,
 } from "@/domains/accounts/types";
 import { AccountForm } from "@/domains/accounts/components/account-form";
+import { DebtTermBadge } from "@/domains/accounts/components/debt-term-badge";
 import { LogBalanceForm } from "@/domains/accounts/components/log-balance-form";
 
 export function AccountsScreen() {
@@ -132,6 +133,8 @@ export function AccountsScreen() {
                 type: editing.type,
                 provider: editing.provider ?? "",
                 currency: editing.currency,
+                interestRatePct: editing.interestRatePct ?? undefined,
+                termEndDate: editing.termEndDate ?? undefined,
               }}
               onSubmit={(values) =>
                 updateAccount.mutate({
@@ -140,6 +143,8 @@ export function AccountsScreen() {
                   type: values.type,
                   provider: values.provider,
                   currency: values.currency,
+                  interestRatePct: values.interestRatePct,
+                  termEndDate: values.termEndDate,
                 })
               }
             />
@@ -212,6 +217,13 @@ function AccountGroup({
                   <div className="text-xs text-foreground/50">
                     {account.provider}
                   </div>
+                ) : null}
+                {isDebt ? (
+                  <DebtTermBadge
+                    className="mt-2"
+                    termEndDate={account.termEndDate}
+                    interestRatePct={account.interestRatePct}
+                  />
                 ) : null}
               </td>
               <td className="px-6 py-4 text-right align-middle">

@@ -40,4 +40,6 @@ export type AccountWithBalance = {
   /** Latest snapshot balance, or null if no balance has been logged yet. */
   latestBalance: number | null;
   latestCapturedAt: Date | null;
+  interestRatePct: number | null;
+  termEndDate: Date | null;
 };
