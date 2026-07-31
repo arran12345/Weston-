@@ -1,6 +1,6 @@
 import { StrategySettings } from "@/domains/allocation/components/strategy-settings";
 import { SalarySettings } from "@/domains/salary/components/salary-settings";
-import { EmptyState } from "@/shared/ui/empty-state";
+import { CategorySettings } from "@/domains/budgeting/components/category-settings";
 
 export default function SettingsPage() {
   return (
@@ -11,11 +11,7 @@ export default function SettingsPage() {
 
       <StrategySettings />
       <SalarySettings />
-
-      <EmptyState
-        title="Categories"
-        description="Spending categories, hierarchical from the start, become editable here once transactions land. Built in Milestone 3."
-      />
+      <CategorySettings />
     </div>
   );
 }
