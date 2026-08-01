@@ -10,6 +10,7 @@ import { Figure } from "@/shared/ui/figure";
 import { formatCurrency, formatDate } from "@/shared/lib/format";
 import { GOAL_TYPE_LABELS } from "@/domains/goals/types";
 import { GoalProgressBar } from "@/domains/goals/components/goal-progress-bar";
+import { GoalTrajectoryCard } from "@/domains/forecasting/components/goal-trajectory-card";
 
 export function GoalDetailScreen({ goalId }: { goalId: string }) {
   const router = useRouter();
@@ -131,12 +132,14 @@ export function GoalDetailScreen({ goalId }: { goalId: string }) {
         />
       </div>
 
+      <GoalTrajectoryCard goalId={goal.data.id} />
+
       {progress.requiredPerMonth !== null ? (
         <p className="max-w-prose text-xs text-foreground/40">
           &ldquo;Needed per month&rdquo; is simple division — the remaining
-          amount spread over the months left. It assumes no investment growth
-          and no withdrawals, so it is a required contribution, not a forecast.
-          Projections arrive with the forecasting engine.
+          amount spread over the months left, assuming no growth and no
+          withdrawals. The trajectory above is the projection that does account
+          for growth; this figure is the flat contribution the target implies.
         </p>
       ) : null}
 

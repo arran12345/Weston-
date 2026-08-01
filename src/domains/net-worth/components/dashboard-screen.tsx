@@ -1,8 +1,10 @@
 "use client";
 
+import Link from "next/link";
+
 import { trpc } from "@/shared/lib/trpc/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
-import { FlatLineChart } from "@/shared/charts/line-chart";
+import { ForecastChart } from "@/shared/charts/forecast-chart";
 import { NetWorthHero } from "@/domains/net-worth/components/net-worth-hero";
 import { AllocationCard } from "@/domains/allocation/components/allocation-card";
 import { DashboardGoalsCard } from "@/domains/goals/components/dashboard-goals-card";
@@ -10,6 +12,7 @@ import { DashboardGoalsCard } from "@/domains/goals/components/dashboard-goals-c
 export function DashboardScreen() {
   const summary = trpc.netWorth.summary.useQuery();
   const history = trpc.netWorth.history.useQuery();
+  const forecast = trpc.forecasting.netWorth.useQuery({ months: 24 });
 
   if (summary.isPending || history.isPending) {
     return <DashboardSkeleton />;
@@ -35,7 +38,7 @@ export function DashboardScreen() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Net worth history</CardTitle>
+          <CardTitle>Net worth — recorded and projected</CardTitle>
         </CardHeader>
         <CardContent>
           {points.length === 0 ? (
@@ -43,12 +46,27 @@ export function DashboardScreen() {
               History appears once balances are logged. Each point is a balance
               you actually recorded — the line never interpolates between them.
             </p>
-          ) : points.length === 1 ? (
-            <p className="py-8 text-sm text-foreground/60">
-              One balance logged. Log another to start a trend.
-            </p>
           ) : (
-            <FlatLineChart data={points} />
+            <>
+              <ForecastChart
+                actual={points}
+                projected={(forecast.data?.points ?? []).map((point) => ({
+                  date: point.date,
+                  value: point.netWorth,
+                }))}
+              />
+              <p className="mt-4 text-xs text-foreground/40">
+                Solid is recorded, dashed is projected at{" "}
+                {((forecast.data?.assumptions.annualGrowthRate ?? 0) * 100).toFixed(
+                  1,
+                )}
+                % assumed annual growth —{" "}
+                <Link href="/forecasts" className="hover:text-foreground">
+                  adjust in Forecasts
+                </Link>
+                .
+              </p>
+            </>
           )}
         </CardContent>
       </Card>
