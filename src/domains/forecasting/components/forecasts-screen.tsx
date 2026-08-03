@@ -37,9 +37,17 @@ export function ForecastsScreen() {
 
   const header = (
     <div className="flex flex-wrap items-end justify-between gap-6">
-      <h1 className="text-xs font-medium uppercase tracking-widest text-foreground/60">
-        Forecasts — where will I be?
-      </h1>
+      <div className="flex flex-col gap-2">
+        <h1 className="text-xs font-medium uppercase tracking-widest text-foreground/60">
+          Forecasts — where will I be?
+        </h1>
+        <Link
+          href="/forecasts/scenarios"
+          className="text-sm hover:underline"
+        >
+          Compare scenarios →
+        </Link>
+      </div>
       <div className="flex flex-wrap items-end gap-4">
         <Field label="Horizon">
           <Select

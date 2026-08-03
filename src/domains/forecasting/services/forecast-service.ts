@@ -7,6 +7,7 @@ import {
   buildGoalTrajectory,
   projectNetWorth,
 } from "@/domains/forecasting/services/project";
+import { summariseScenarios } from "@/domains/forecasting/services/compare";
 import {
   DEFAULT_ANNUAL_GROWTH_RATE,
   DEFAULT_FORECAST_MONTHS,
@@ -75,6 +76,62 @@ export async function getNetWorthForecast(
     assumptions,
     hasData: accounts.some((account) => account.latestBalance !== null),
     points: projectNetWorth(start, assumptions),
+  };
+}
+
+export type ScenarioInput = {
+  id: string;
+  label: string;
+  monthlyCashContribution?: number;
+  monthlyInvestmentContribution?: number;
+  annualGrowthRate?: number;
+};
+
+/**
+ * Runs the same engine once per scenario against the same starting position
+ * (Section 12) — the "what if" feature is a parameterisation, not a second
+ * implementation.
+ */
+export async function compareScenarios(
+  prisma: PrismaClient,
+  userId: string,
+  scenarios: ScenarioInput[],
+  months: number = DEFAULT_FORECAST_MONTHS,
+) {
+  const [accounts, strategy] = await Promise.all([
+    listAccounts(prisma, userId),
+    getStrategy(prisma, userId),
+  ]);
+
+  const start = toStartingPosition(accounts);
+  // One start date for all runs, so the series line up month for month.
+  const startDate = new Date();
+
+  const runs = scenarios.map((scenario) => {
+    const assumptions = {
+      monthlyCashContribution:
+        scenario.monthlyCashContribution ?? strategy.savingsAmount,
+      monthlyInvestmentContribution:
+        scenario.monthlyInvestmentContribution ?? strategy.investmentAmount,
+      annualGrowthRate:
+        scenario.annualGrowthRate ?? DEFAULT_ANNUAL_GROWTH_RATE,
+      months,
+      startDate,
+    };
+
+    return {
+      id: scenario.id,
+      label: scenario.label,
+      ...assumptions,
+      points: projectNetWorth(start, assumptions),
+    };
+  });
+
+  return {
+    start,
+    months,
+    hasData: accounts.some((account) => account.latestBalance !== null),
+    scenarios: summariseScenarios(runs),
   };
 }
 
