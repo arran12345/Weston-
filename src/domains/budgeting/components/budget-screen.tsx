@@ -52,6 +52,9 @@ export function BudgetScreen() {
       </h1>
       <div className="flex items-center gap-4">
         <MonthSelector month={month} onChange={setMonth} />
+        <Button variant="outline" asChild>
+          <Link href="/budget/import">Import CSV</Link>
+        </Button>
         <Button
           onClick={() => setAddOpen(true)}
           disabled={!accounts.data || accounts.data.length === 0}
