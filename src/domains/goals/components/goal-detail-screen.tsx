@@ -73,11 +73,11 @@ export function GoalDetailScreen({ goalId }: { goalId: string }) {
         </Button>
       </div>
 
-      <section className="border border-border px-8 py-8">
+      <section className="border border-border px-5 py-6 sm:px-8 sm:py-8">
         <span className="text-xs uppercase tracking-widest text-foreground/60">
           Progress
         </span>
-        <Figure className="mt-3 block text-[64px] leading-none font-semibold">
+        <Figure className="mt-3 block text-5xl leading-none font-semibold sm:text-[64px]">
           {progress.percentComplete.toFixed(1)}%
         </Figure>
         <GoalProgressBar progress={progress} className="mt-6" />

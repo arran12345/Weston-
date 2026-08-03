@@ -33,9 +33,12 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <TRPCProvider>
-          <div className="grid min-h-screen grid-cols-[240px_1fr]">
+          {/* Sidebar on a laptop; nav collapses to a top bar on phones. */}
+          <div className="flex min-h-screen flex-col md:grid md:grid-cols-[240px_1fr]">
             <Nav />
-            <main className="overflow-x-hidden px-10 py-8">{children}</main>
+            <main className="min-w-0 overflow-x-hidden px-5 py-6 md:px-10 md:py-8">
+              {children}
+            </main>
           </div>
         </TRPCProvider>
       </body>

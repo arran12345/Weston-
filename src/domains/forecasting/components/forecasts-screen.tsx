@@ -117,11 +117,11 @@ export function ForecastsScreen() {
     <div className="flex flex-col gap-8">
       {header}
 
-      <section className="border border-border px-8 py-8">
+      <section className="border border-border px-5 py-6 sm:px-8 sm:py-8">
         <span className="text-xs uppercase tracking-widest text-foreground/60">
           Projected net worth in {monthsLabel(months)}
         </span>
-        <Figure className="mt-3 block text-[64px] leading-none font-semibold">
+        <Figure className="mt-3 block text-5xl leading-none font-semibold sm:text-[64px]">
           {formatCurrency(final.netWorth, { fractionDigits: 0 })}
         </Figure>
         <p className="mt-4 text-sm text-foreground/60">
@@ -169,7 +169,7 @@ export function ForecastsScreen() {
         <CardHeader>
           <CardTitle>Milestones</CardTitle>
         </CardHeader>
-        <CardContent className="px-0 py-0">
+        <CardContent className="overflow-x-auto px-0 py-0">
           <table className="w-full text-sm">
             <tbody>
               {[12, 24, 36, 60, 120]

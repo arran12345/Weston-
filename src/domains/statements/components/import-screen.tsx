@@ -502,8 +502,8 @@ function ConfirmStep({
               account.
             </p>
           ) : (
-            <div className="max-h-[520px] overflow-y-auto">
-              <table className="w-full text-sm">
+            <div className="max-h-[520px] overflow-auto">
+              <table className="w-full min-w-[620px] text-sm">
                 <tbody>
                   {data.rows.map((row, index) => (
                     <tr

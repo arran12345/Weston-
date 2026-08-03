@@ -207,7 +207,8 @@ function AccountGroup({
         </Figure>
       </header>
 
-      <table className="w-full text-sm">
+      <div className="overflow-x-auto">
+      <table className="w-full min-w-[600px] text-sm">
         <tbody>
           {accounts.map((account) => (
             <tr key={account.id} className="border-b border-border last:border-b-0">
@@ -284,6 +285,7 @@ function AccountGroup({
           ))}
         </tbody>
       </table>
+      </div>
     </section>
   );
 }

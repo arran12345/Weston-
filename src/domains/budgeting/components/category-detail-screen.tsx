@@ -128,7 +128,7 @@ export function CategoryDetailScreen({ categoryId }: { categoryId: string }) {
               : ""}
           </CardTitle>
         </CardHeader>
-        <CardContent className="px-0 py-0">
+        <CardContent className="overflow-x-auto px-0 py-0">
           {transactions.isPending ? (
             <div className="h-40 w-full bg-foreground/5" />
           ) : transactions.isError ? (
@@ -140,7 +140,7 @@ export function CategoryDetailScreen({ categoryId }: { categoryId: string }) {
               No transactions in this category for this month.
             </p>
           ) : (
-            <table className="w-full text-sm">
+            <table className="w-full min-w-[560px] text-sm">
               <tbody>
                 {transactions.data.map((transaction) => (
                   <tr

@@ -12,12 +12,12 @@ export function NetWorthHero({ summary }: { summary: NetWorthSummary }) {
   const hasData = summary.asOf !== null;
 
   return (
-    <section className="border border-border px-8 py-10">
+    <section className="border border-border px-5 py-8 sm:px-8 sm:py-10">
       <h1 className="text-xs font-medium uppercase tracking-widest text-foreground/60">
         Net worth
       </h1>
 
-      <Figure className="mt-4 block text-[80px] leading-none font-semibold">
+      <Figure className="mt-4 block text-5xl leading-none font-semibold sm:text-[80px]">
         {hasData ? formatCurrency(summary.current, { fractionDigits: 0 }) : "—"}
       </Figure>
 

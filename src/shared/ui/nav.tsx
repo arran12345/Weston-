@@ -18,13 +18,14 @@ export function Nav() {
   const pathname = usePathname();
 
   return (
-    <nav className="flex h-full flex-col border-r border-border">
-      <div className="border-b border-border px-6 py-5">
+    <nav className="flex flex-col border-b border-border md:h-full md:border-b-0 md:border-r">
+      <div className="border-b border-border px-5 py-4 md:px-6 md:py-5">
         <span className="text-sm font-bold uppercase tracking-widest">
           Finance OS
         </span>
       </div>
-      <ul className="flex-1">
+      {/* A scrolling strip on phones, a stacked list from md up. */}
+      <ul className="flex flex-1 overflow-x-auto md:block md:overflow-visible">
         {links.map((link) => {
           const isActive =
             link.href === "/"
@@ -32,11 +33,14 @@ export function Nav() {
               : pathname.startsWith(link.href);
 
           return (
-            <li key={link.href} className="border-b border-border">
+            <li
+              key={link.href}
+              className="shrink-0 border-r border-border last:border-r-0 md:border-r-0 md:border-b"
+            >
               <Link
                 href={link.href}
                 className={cn(
-                  "block px-6 py-3 text-sm uppercase tracking-wide transition-colors duration-150",
+                  "block whitespace-nowrap px-5 py-3 text-sm uppercase tracking-wide transition-colors duration-150 md:px-6",
                   isActive
                     ? "bg-foreground text-background"
                     : "text-foreground hover:bg-foreground/10",

@@ -142,8 +142,8 @@ export function BudgetScreen() {
           <CardHeader>
             <CardTitle>Category breakdown</CardTitle>
           </CardHeader>
-          <CardContent className="px-0 py-0">
-            <table className="w-full text-sm">
+          <CardContent className="overflow-x-auto px-0 py-0">
+            <table className="w-full min-w-[520px] text-sm">
               <thead>
                 <tr className="border-b border-border text-xs uppercase tracking-widest text-foreground/50">
                   <th className="px-6 py-3 text-left font-medium">Category</th>
