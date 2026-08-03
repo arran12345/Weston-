@@ -11,13 +11,52 @@ services. See `docs/PRD.md` Section 7.
 
 ## Getting started
 
+Requires Node 20 or newer.
+
 ```bash
+cp .env.example .env   # sets DATABASE_URL; required before migrating
 npm install
-npm run db:migrate   # applies the Prisma schema to a local SQLite file
+npm run db:migrate     # creates prisma/dev.db from the schema
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3000](http://localhost:3000). There's no login — it's a
+single-user local app (PRD Section 7).
+
+To run it as a build rather than in dev mode:
+
+```bash
+npm run build && npm start
+```
+
+### First run
+
+The app starts empty. A sensible order:
+
+1. **Accounts** — add your savings, investment, current and debt accounts with
+   their current balances. Net worth appears on the dashboard immediately.
+2. **Settings** — set the monthly allocation split and log your salary.
+3. **Budget** — create the starter categories, then add transactions or import
+   a CSV from your bank.
+4. **Goals** — create a goal and link the accounts that count toward it.
+5. **Forecasts** — projections run off your balances and allocation strategy.
+
+Log a balance again each month; net worth history is built from those
+snapshots, so the trend and forecasts get better the more you log.
+
+## Other commands
+
+```bash
+npm test          # domain logic tests
+npm run test:watch
+npm run lint
+npm run db:studio # browse the database
+```
+
+## Backups
+
+The whole database is one file: `prisma/dev.db`. Copy it somewhere safe
+periodically — that's the entire backup story (PRD Section 17).
 
 ## Project layout
 
