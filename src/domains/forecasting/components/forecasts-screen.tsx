@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 
 import { trpc } from "@/shared/lib/trpc/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
