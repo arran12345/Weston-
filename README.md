@@ -44,6 +44,36 @@ The app starts empty. A sensible order:
 Log a balance again each month; net worth history is built from those
 snapshots, so the trend and forecasts get better the more you log.
 
+## On your phone
+
+The app installs to a home screen as a PWA — real icon, full screen, no
+browser chrome. It is still a client for whichever machine runs the server,
+so that machine has to be awake and reachable. Nothing is hosted; your data
+never leaves your own devices.
+
+**On the same wifi**, `npm run dev` prints a Network URL
+(`http://192.168.x.x:3000`) — open that on your phone. If it doesn't bind to
+the network, run `npm run dev -- -H 0.0.0.0`.
+
+**From anywhere**, put both devices on a [Tailscale](https://tailscale.com)
+network (free for personal use). It's a private link between your own
+machines, encrypted end to end — nothing is exposed publicly and no account
+data is stored on their servers. Install it on the laptop and the phone, sign
+in with the same account on both, then use the laptop's Tailscale address
+(`http://your-laptop:3000`).
+
+**Then install it:**
+
+- **iOS/Safari** — Share → Add to Home Screen
+- **Android/Chrome** — menu → Install app
+
+One caveat worth knowing: iOS only offers "Add to Home Screen" from Safari,
+not Chrome or Firefox.
+
+There is no login (Section 7), so anyone who can reach the address can see
+everything. That's fine over Tailscale or home wifi — do not port-forward it
+to the open internet.
+
 ## Other commands
 
 ```bash
